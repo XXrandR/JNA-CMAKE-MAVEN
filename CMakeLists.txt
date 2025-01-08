@@ -11,6 +11,6 @@ set(JNASAMPLE_SOURCES
   JnaSample.h
 )
 
+# Important to make it SHARED, to be able to read it from java jna interface
 add_library(JnaSample SHARED ${SRC_DIR}/jna.cpp)
-# add_executable(JnaSample ${SRC_DIR}/jna.cpp)
 

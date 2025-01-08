@@ -1,12 +1,14 @@
-#include<iostream>;
+#include<iostream>
 
 using namespace std;
 
-int main(){
-    cout << "Test, Test";
-    return(0);
+int generateRandomNumber(int maxNumber) {
+	srand(time(0));
+	return rand() % maxNumber;
 }
 
-int getValue(){
-    return(5);
+extern "C" {
+    int JnaInterface_getValue(int maxNumber) {
+        return generateRandomNumber(maxNumber);
+    }
 }
