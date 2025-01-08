@@ -1,6 +1,9 @@
+package com.jhosua;
+
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
+
 
 /** Simple example of JNA interface mapping and usage. */
 public class JNASample {
@@ -30,5 +33,7 @@ public class JNASample {
         System.out.println("Page Size: " + CLibrary.INSTANCE.sysconf(_SC_PAGE_SIZE));
 
         System.out.println("CPUs: " + Runtime.getRuntime().availableProcessors());
+        JnaInterface jna = new JnaInterface();
+        System.out.println(jna.getValue());
     }
 }

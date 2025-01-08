@@ -7,13 +7,14 @@
     <groupId>com.jhosua</groupId>
     <artifactId>jhosua</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <prerequisites>
         <maven>3.9.6</maven>
     </prerequisites>
 
     <properties>
-        <main.class>JNASample</main.class>
+        <main.class>com.jhosua.JNASample</main.class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
     </properties>
@@ -34,49 +35,86 @@
                     <artifactId>cmake-maven-plugin</artifactId>
                       <version>3.30.2-b1</version>
 
-                        <executions>
-                            <execution>
+                     <executions>
+
+                         <!-- generate builders -->
+                        <execution>
                             <id>cmake-generate</id>
                             <goals>
                                 <goal>generate</goal>
                             </goals>
-                        <configuration>
+                            <configuration>
+                                <sourcePath>
+                                    .
+                                </sourcePath>
+                                <targetPath>
+                                    build/
+                                </targetPath>
+                                <environmentVariables>
+                                    <key>value</key>
+                                </environmentVariables>
+                                <options>
+                                    <option>-DBUILD_THIRDPARTY:bool=on</option>
+                                </options>
+                            </configuration>
+                        </execution>
 
-                            <sourcePath>
-                                .
-                            </sourcePath>
+                         <!-- compile code -->
+                        <execution>
+                            <id>cmake-compile</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <config>
+                                    Release
+                                </config>
+                                <target>
+                                    all
+                                </target>
+                                <projectDirectory>
+                                    build/
+                                </projectDirectory>
+                                <environmentVariables>
+                                    <key>value</key>
+                                </environmentVariables>
+                            </configuration>
+                        </execution>
 
-                            <targetPath>
-                                build/
-                            </targetPath>
-
-                            <environmentVariables>
-                                <key>value</key>
-                            </environmentVariables>
-
-                            <options>
-                                <option>-DBUILD_THIRDPARTY:bool=on</option>
-                            </options>
-
-                        </configuration>
-                    </execution>
-                </executions>
+                    </executions>
             </plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.4.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>${main.class}</mainClass>  <!-- Ensure this is correct -->
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
 
             <plugin>                                                                
                 <groupId>org.apache.maven.plugins</groupId>                         
                 <artifactId>maven-assembly-plugin</artifactId>                      
                 <version>3.7.1</version>                                            
                 <configuration>                                                       
-                    <descriptorRefs>                                                    
-                        <descriptorRef>jar-with-dependencies</descriptorRef>                
-                            </descriptorRefs>                                                   
-                            <archive>                                                               
-                                <manifest>                                                              
-                                    <addClasspath>true</addClasspath>                                   
-                                    <mainClass>${main.class}</mainClass>                            
-                                    </manifest>                                                     
-                                        </archive>                                                        
+
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+
+                    <archive>                                                               
+                        <manifest>                                                              
+                            <addClasspath>true</addClasspath>                                   
+                            <mainClass>${main.class}</mainClass>                            
+                        </manifest>                                                     
+                    </archive>                                                        
+
                 </configuration>                                                    
                 <executions>                                                            
                     <execution>                                                             
@@ -88,7 +126,33 @@
                     </execution>                                                    
                 </executions>                                                   
             </plugin>                                                  
-            
+
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+    			<version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-native-libs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>build/</directory>
+                                    <includes>
+                                        <include>*.so</include> <!-- or *.dll for Windows -->
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
 
         <pluginManagement>
